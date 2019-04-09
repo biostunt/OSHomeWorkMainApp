@@ -35,7 +35,7 @@ public class AppWorker {
     }
     private void runThreads(){
         String[] settings = (new JSONController()).getThreadSettings();
-        int count = 10;
+        int count = 150;
         new Thread(new ThreadHeader(settings[0],webDriver,count)).start();
         new Thread(new ThreadContent(settings[1],webDriver,count)).start();
         new Thread(new ThreadFiles(settings[2],webDriver,count)).start();
@@ -62,7 +62,9 @@ public class AppWorker {
     private void StartWebDriver(){
         try {
             (new Log()).println("Creating WebDriver..");
-            webDriver = new RemoteWebDriver(new URL("http://localhost:9515"), new ChromeOptions());
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--no-sandbox");
+            webDriver = new RemoteWebDriver(new URL("http://localhost:9515"), options);
             (new Log()).println("WebDriver created");
         } catch(Exception e){
             (new Log()).println("Can't create WebDriver");

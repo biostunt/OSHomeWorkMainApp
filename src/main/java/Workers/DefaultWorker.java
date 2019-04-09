@@ -11,11 +11,13 @@ public abstract class DefaultWorker extends SocketExtension implements Runnable 
     protected String filename;
     protected String filepath;
     protected int maxCount;
+    private int maxFreeze;
     protected int currentCount = 0;
 
     public DefaultWorker(WebDriver webDriver, int maxCount){
         super();
         this.maxCount = maxCount;
+        this.maxFreeze = this.maxCount;
         this.webDriver = webDriver;
     }
     public DefaultWorker(WebDriver webDriver,String filename, int maxCount){
@@ -24,25 +26,26 @@ public abstract class DefaultWorker extends SocketExtension implements Runnable 
         this.filename = filename;
         this.filepath = ResFilePath + filename;
         this.maxCount = maxCount;
+        this.maxFreeze = this.maxCount;
     }
     public DefaultWorker(int maxCount){
         super();
         this.maxCount = maxCount;
+        this.maxFreeze = this.maxCount;
     }
 
 
     public void run(){
         while(currentCount < maxCount){
-            System.out.println(filepath + " - " + (currentCount - (maxCount - 150)));
             take();
             work();
             release();
+            System.out.println(filepath + " - " + (currentCount - (maxCount - maxFreeze)));
         }
         (new Log()).println(this.getClass().getName() + " ended!");
         if(filename != null){
             take();
             String file = System.getProperty("user.dir") + "\\bin\\statements\\" + getFileName(filename) + ".json";
-            System.out.println(file);
             (new JSONController()).setJsonStatement(file,"isFinished",1 + "");
             release();
         }

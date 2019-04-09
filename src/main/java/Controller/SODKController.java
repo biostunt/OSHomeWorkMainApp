@@ -4,14 +4,17 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class SODKController<T> {
+    private int sleepNotifier = 500;
     public SODKController(){}
     public T getObject(String filepath,int pos){
         T object = null;
         try{
-            ObjectInputStream in =  new ObjectInputStream(
-                    new FileInputStream(filepath));
+            FileInputStream fis = new FileInputStream(filepath);
+            ObjectInputStream in =  new ObjectInputStream(fis);
             ArrayList<T> arrayList = (ArrayList<T>) in.readObject();
             object = arrayList.get(pos);
+            Thread.sleep(sleepNotifier);
+            fis.close();
             in.close();
         }catch (Exception e){
             System.out.println("Error while getting object. Path:" + filepath);
@@ -21,9 +24,13 @@ public class SODKController<T> {
     private ArrayList<T> getAllObject(String filepath){
         ArrayList<T> arrayList = new ArrayList<T>();
         try{
-            ObjectInputStream in =  new ObjectInputStream(new FileInputStream(filepath));
+            FileInputStream fis = new FileInputStream(filepath);
+            ObjectInputStream in =  new ObjectInputStream(fis);
             arrayList = (ArrayList<T>) in.readObject();
+            Thread.sleep(sleepNotifier);
+            fis.close();
             in.close();
+
         } catch (FileNotFoundException e){
             System.out.println("File didnt Found. Path:" + filepath);
         } catch (EOFException e){
@@ -36,13 +43,16 @@ public class SODKController<T> {
     public void writeObject(String filepath,T object){
         ArrayList<T> arrayList = getAllObject(filepath);
         arrayList.add(object);
-
+        writeObjectToFile(filepath,arrayList);
     }
     public void writeObjectToFile(String filepath,ArrayList<T> arrayList){
         try{
             FileOutputStream fout = new FileOutputStream(filepath);
             ObjectOutputStream oos = new ObjectOutputStream(fout);
             oos.writeObject(arrayList);
+            Thread.sleep(sleepNotifier);
+            fout.close();
+            oos.close();
         } catch (Exception e){
             System.out.println("Error while writing ArrayList into file");
         }
@@ -52,9 +62,11 @@ public class SODKController<T> {
     }
     public void rewriteFile(String filepath){
         try{
-            ObjectOutputStream out = new ObjectOutputStream(
-                    new FileOutputStream(filepath));
+            FileOutputStream fout = new FileOutputStream(filepath);
+            ObjectOutputStream out = new ObjectOutputStream(fout);
             out.writeObject(new ArrayList<T>());
+            Thread.sleep(sleepNotifier);
+            fout.close();
             out.close();
         } catch (Exception e){
             (new Log()).println("can't rewrite " + filepath);
